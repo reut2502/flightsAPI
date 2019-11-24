@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="../Scripts/ajaxCalls.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $("#searchBtn").click(getFlights);
+
+        });
+
+        function getFlights() {
+
+            var fromCity = $("#fromCity").val();
+            var toCity = $("#toCity").val();
+            var fromDate = $("#fromDate").val().split('-').reverse().join("/");
+            var toDate = $("#toDate").val().split('-').reverse().join("/");
+            //str = 'https://api.skypicker.com/flights?flyFrom=PRG&amp;to=LND&amp;dateFrom=25/01/2019&amp;dateTo=25/10/2019&amp;partner=reut';
+
+            ajaxCall("GET", `https://`+`api.skypicker.com/flights?flyFrom=${fromCity}&to=${toCity}&dateFrom=${fromDate}&dateTo=${toDate}&partner=reut`, "", getFlightsSuccessCB, getFlightsErrorCB);
+
+        }
+
+        function getFlightsSuccessCB(data) {
+            
+            flightsArr = data.data;
+
+            var str = "";
+            for (let flight of flightsArr) {
+                str += `< div id = "flightDetails" >
+                        <p>Price: ${flight.conversion.EUR} €</p>
+                        <p>Departure Time: ${new Date(flight.dTime * 1000).toLocaleString()}</p>
+                        <p>Arrival: ${new Date(flight.aTimeUTC * 1000).toLocaleString()}</p>
+                        <p>Route: </p>`
+                for (tmp of flight.route) {
+                str += `< p > ${ tmp.fromCity } & rarr ${ tmp.toCity } </p > `
+                }
+                    str+=`< p >
+                    Airlines: 
+                    </p >
+                    
+                </div >`;
+            }
+                document.getElementById("showFlights").innerHTML=str;
+        }
+
+
+
+        
+
+
+
+
+    function getFlightsErrorCB(err) {
+    console.log(err)
+    }
+
+    </script>
+    <style>
+        #form p {
+            font-size: larger;
+            font-style: oblique;
+            font-weight: 600;
+
+        }
+
+        body {
+            text-align-last: center;
+        }
+
+        button {
+            margin-right: 0.5em;
+            margin-left: 0.5em;
+            margin-top: 2em;
+            height: 45px;
+            width: 124px;
+
+
+        }
+
+        #flightDetails {
+            margin: 1em auto;
+            background-color: rgba(145, 240, 232, 0.63);
+        }
+
+        #flightDetails p {
+            padding-bottom: 0.6em;
+            margin-bottom: 0px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="form">
+        <p class="my-3">Fly from:</p>
+        <input type="text" id="fromCity" value="PRG" placeholder="Origin Airport" />
+        <p class="my-3">To:</p>
+        <input type="text" id="toCity" value="LGW" placeholder="Destination Airport" />
+        <p class="my-3">date from:</p>
+        <input type="date" id="fromDate" value="2019-02-25" />
+        <p class="my-3">Until:</p>
+        <input type="date" id="toDate" value="2019-03-25" />
+    </div>
+    <div>
+        <button id="searchBtn">Find Flights</button>
+        <button id="myFlights">My Flights</button>
+    </div>
+    <div id="showFlights" class="container-fluid">
+
+
+    </div>
+
+</body>
+
+</html>
